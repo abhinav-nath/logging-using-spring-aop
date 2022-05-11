@@ -1,2 +1,1 @@
-# logging-using-spring-aop
-Logging using Spring AOP
+# Logging using Spring AOP
