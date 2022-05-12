@@ -1,6 +1,5 @@
 package com.codecafe.spring.aop.controller;
 
-import com.codecafe.spring.aop.entity.Order;
 import com.codecafe.spring.aop.model.CreateOrderRequest;
 import com.codecafe.spring.aop.model.CreateOrderResponse;
 import com.codecafe.spring.aop.model.GetOrderResponse;
@@ -21,15 +20,17 @@ public class OrderController {
 
   @PostMapping
   ResponseEntity<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest createOrderRequest) {
-    Order createdOrder = orderService.createOrder(createOrderRequest);
-    CreateOrderResponse createOrderResponse = createdOrder.toCreateOrderResponse();
+    CreateOrderResponse createOrderResponse = orderService.createOrder(createOrderRequest);
     return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
   }
 
   @GetMapping("/{orderId}")
   ResponseEntity<GetOrderResponse> getOrderDetails(@PathVariable("orderId") int orderId) {
-    Order order = orderService.getOrderDetails(orderId);
-    GetOrderResponse getOrderResponse = order.toGetOrderResponse();
+    GetOrderResponse getOrderResponse = orderService.getOrderDetails(orderId);
+
+    if (getOrderResponse == null)
+      return ResponseEntity.notFound().build();
+
     return ResponseEntity.ok(getOrderResponse);
   }
 

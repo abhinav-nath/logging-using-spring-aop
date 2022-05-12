@@ -2,6 +2,8 @@ package com.codecafe.spring.aop.service;
 
 import com.codecafe.spring.aop.entity.Order;
 import com.codecafe.spring.aop.model.CreateOrderRequest;
+import com.codecafe.spring.aop.model.CreateOrderResponse;
+import com.codecafe.spring.aop.model.GetOrderResponse;
 import com.codecafe.spring.aop.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +19,7 @@ public class OrderService {
     this.orderRepository = orderRepository;
   }
 
-  public Order createOrder(CreateOrderRequest createOrderRequest) {
+  public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
     int orderId = new Random().nextInt(10000);
 
     Order order = Order.builder()
@@ -26,11 +28,17 @@ public class OrderService {
                        .items(createOrderRequest.getItems())
                        .build();
 
-    return orderRepository.save(order);
+    Order createdOrder = orderRepository.save(order);
+    return createdOrder.toCreateOrderResponse();
   }
 
-  public Order getOrderDetails(int orderId) {
-    return orderRepository.findById(orderId);
+  public GetOrderResponse getOrderDetails(int orderId) {
+    Order order = orderRepository.findById(orderId);
+
+    if (order == null)
+      return null;
+
+    return order.toGetOrderResponse();
   }
 
 }
