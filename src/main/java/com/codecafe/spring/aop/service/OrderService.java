@@ -2,19 +2,19 @@ package com.codecafe.spring.aop.service;
 
 import com.codecafe.spring.aop.entity.Order;
 import com.codecafe.spring.aop.model.CreateOrderRequest;
+import com.codecafe.spring.aop.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Random;
 
 @Service
 public class OrderService {
 
-  private final Map<Integer, Order> orders;
+  private final OrderRepository orderRepository;
 
-  public OrderService(Map<Integer, Order> orders) {
-    this.orders = orders;
+  public OrderService(OrderRepository orderRepository) {
+    this.orderRepository = orderRepository;
   }
 
   public Order createOrder(CreateOrderRequest createOrderRequest) {
@@ -26,13 +26,11 @@ public class OrderService {
                        .items(createOrderRequest.getItems())
                        .build();
 
-    orders.put(orderId, order);
-
-    return order;
+    return orderRepository.save(order);
   }
 
   public Order getOrderDetails(int orderId) {
-    return orders.get(orderId);
+    return orderRepository.findById(orderId);
   }
 
 }
