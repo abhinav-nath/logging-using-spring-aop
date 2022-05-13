@@ -1,6 +1,7 @@
 package com.codecafe.spring.aop.logging;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -24,6 +25,14 @@ public class LoggingAspect {
     // Method is empty as this is just a Pointcut, the implementations are in the advices.
   }
 
+  /**
+   * Pointcut that matches all Spring beans in the application's main packages.
+   */
+  @Pointcut("within(com.codecafe.spring.aop.controller..*)" + " || within(com.codecafe.spring.aop.service..*)")
+  public void applicationPackagePointcut() {
+    // Method is empty as this is just a Pointcut, the implementations are in the advices.
+  }
+
   @Before("inControllers()")
   public void beforeHttpLogging(JoinPoint joinPoint) {
     Logger logger = this.logger(joinPoint);
@@ -32,6 +41,18 @@ public class LoggingAspect {
                                           .append(" ")
                                           .append(request.getRequestURI());
     logger.info("Incoming Request : {}", sb);
+  }
+
+  /**
+   * Advice that logs methods throwing exceptions.
+   *
+   * @param joinPoint join point for advice.
+   * @param e         exception.
+   */
+  @AfterThrowing(pointcut = "applicationPackagePointcut()", throwing = "e")
+  public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
+    logger(joinPoint).error("Exception in {}() with cause = '{}' and exception = '{}'",
+      joinPoint.getSignature().getName(), e.getCause() != null ? e.getCause() : "NULL", e.getMessage(), e);
   }
 
   /**
